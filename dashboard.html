@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Progress</title>
+
+ <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap" rel="stylesheet">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Navigation bar -->
+<nav class="navbar navbar-expand-lg">
+<div class="container">
+  <a class="navbar-brand">Tick-To-Do</a>
+  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarContent">
+    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+      <li class="nav-item"><a class="nav-link active oswald" href="dashboard.html">Progress</a></li>
+      <li class="nav-item"><a class="nav-link oswald" href="schedule.html">Smart Schedule</a></li>
+       <li class="nav-item"><a class="nav-link active oswald" href="moodboard.html">Mood Board</a></li>
+    </ul>
+    <span class="text-white me-3">Welcome, dear student.</span>
+    <div class="d-flex align-items-center gap-3">
+      <a href="logout.html" class="btn btn-danger btn-sm">Logout</a>
+      <button class="btn btn-light btn-sm" id="darkModeToggle">
+        <i class="bi bi-moon-stars-fill" id="darkModeIcon"></i>
+      </button>
+    </div>
+  </div>
+</div>
+</nav>
+
+<div class="container mt-4">
+  <!-- Assignment-To-Do-->
+  <div class="card dashboard-card p-4 mb-4">
+    <h3>Assignment-To-Do-List</h3>
+    <div class="row g-2 mb-3">
+      <div class="col-md-4">
+        <input type="text" id="assignmentName" class="form-control" placeholder="Assignment Name">
+      </div>
+      <div class="col-md-4">
+        <input type="date" id="dueDate" class="form-control">
+      </div>
+      <div class="col-md-2">
+        <select id="status" class="form-select">
+          <option value="Pending">Not Started</option>
+          <option value="Pending">In Progress</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <button class="btn btn-primary w-100" onclick="addAssignment()">
+          <i class="bi bi-plus-circle"></i> Add
+        </button>
+      </div>
+    </div>
+
+    <table class="table table-bordered text-center align-middle" id="assignmentTable">
+      <thead>
+        <tr>
+          <th>Assignment</th>
+          <th>Due Date</th>
+          <th>Status</th>
+          <th>Delete</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div class="row">
+    <!-- Ongoing/Completed/Reminder -->
+    <div class="col-md-6 d-flex flex-column gap-3">
+      <div class="card dashboard-card p-3">
+        <h4>Ongoing Assignments</h4>
+        <div class="d-flex gap-2 mb-3">
+          <input type="text" id="ongoingInput" class="form-control" placeholder="New Assignment">
+          <button class="btn btn-primary btn-sm" onclick="addTask('ongoing')"><i class="bi bi-plus-circle"></i> Add</button>
+        </div>
+        <ul id="ongoingList" class="list-group"></ul>
+      </div>
+
+      <div class="card dashboard-card p-3">
+        <h4>Completed Assignments</h4>
+        <div class="d-flex gap-2 mb-3">
+          <input type="text" id="completedInput" class="form-control" placeholder="Completed Assignment">
+          <button class="btn btn-success btn-sm" onclick="addTask('completed')"><i class="bi bi-plus-circle"></i> Add</button>
+        </div>
+        <ul id="completedList" class="list-group"></ul>
+      </div>
+
+      <div class="card dashboard-card p-3">
+        <h4>Reminder Calendar & Note</h4>
+        <div class="row g-2 mb-3">
+          <div class="col-md-4">
+            <input type="date" id="reminderDate" class="form-control">
+          </div>
+          <div class="col-md-8">
+            <textarea id="reminderNote" class="form-control" placeholder="Enter note"></textarea>
+          </div>
+        </div>
+        <button class="btn btn-primary mb-3" onclick="addReminder()">
+          <i class="bi bi-plus-circle"></i> Add Reminder
+        </button>
+        <ul id="reminderList" class="list-group"></ul>
+      </div>
+    </div>
+
+    <!--Pie Chart that link with ongoing/completed assignment -->
+    <div class="col-md-6">
+      <div class="card dashboard-card p-3">
+        <h4>Progress Overview</h4>
+        <canvas id="assignmentPieChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="bawah mt-4">
+  © 2026 Tick-To-Do. All rights reserved.
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+// Check Login
+let loggedInEmail = localStorage.getItem("loggedInEmail");
+
+if (!loggedInEmail) {
+  window.location.href = "index.html";
+}
+
+const dashboardKey = "dashboardData_" + loggedInEmail;
+
+let dashboardData = JSON.parse(localStorage.getItem(dashboardKey)) || {
+  assignments: [],
+  ongoing: [],
+  completed: [],
+  reminders: []
+};
+
+// Dark Mode
+const darkModeToggle = document.getElementById('darkModeToggle');
+        const darkModeIcon = document.getElementById('darkModeIcon');
+        const htmlElement = document.documentElement;
+
+        //check current theme
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        htmlElement.setAttribute('data-bs-theme', currentTheme);
+        updateIcon(currentTheme);
+
+        //toggle
+        darkModeToggle.addEventListener('click', () => {
+            const currentTheme = htmlElement.getAttribute('data-bs-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+            htmlElement.setAttribute('data-bs-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateIcon(newTheme);
+        });
+
+        //change icon
+        function updateIcon(theme) {
+            if (theme === 'dark'){
+                darkModeIcon.className = 'bi bi-sun-fill';
+            } else {
+                darkModeIcon.className = 'bi bi-moon-stars-fill';
+            }
+        }
+
+function saveDashboardData() {
+  localStorage.setItem(dashboardKey, JSON.stringify(dashboardData));
+}
+
+// Assignment-To-Do
+let assignmentTableBody = document.querySelector("#assignmentTable tbody");
+
+function addAssignment() {
+  let name = document.getElementById("assignmentName").value.trim();
+  let due = document.getElementById("dueDate").value;
+  let status = document.getElementById("status").value;
+
+  if (!name || !due) return alert("Fill all fields");
+
+  dashboardData.assignments.push({
+    name,
+    due,
+    status
+  });
+
+  saveDashboardData();
+  renderAssignments();
+
+  document.getElementById("assignmentName").value = '';
+  document.getElementById("dueDate").value = '';
+}
+
+function renderAssignments() {
+  assignmentTableBody.innerHTML = "";
+
+  dashboardData.assignments.forEach((item, index) => {
+    let row = document.createElement("tr");
+
+    row.innerHTML = `
+      <td>${item.name}</td>
+      <td>${item.due}</td>
+      <td>
+        <select class="form-select form-select-sm"
+          onchange="changeStatus(this, ${index})">
+          <option value="Not Started"
+            ${item.status === 'Not Started' ? 'selected' : ''}>
+            Not Started
+          </option>
+           <option value="In Progress"
+            ${item.status === 'In Progress' ? 'selected' : ''}>
+            In Progress
+          </option>
+          <option value="Completed"
+            ${item.status === 'Completed' ? 'selected' : ''}>
+            Completed
+          </option>
+        </select>
+      </td>
+
+      <td>
+        <button class="btn btn-danger btn-sm"
+          onclick="deleteAssignment(${index})">
+          Delete
+        </button>
+      </td>
+    `;
+
+    assignmentTableBody.appendChild(row);
+  });
+}
+
+function changeStatus(select, index) {
+  dashboardData.assignments[index].status = select.value;
+  saveDashboardData();
+}
+
+function deleteAssignment(index) {
+  dashboardData.assignments.splice(index, 1);
+  saveDashboardData();
+  renderAssignments();
+}
+
+// Ongoing/completed assignment
+let ongoingList = document.getElementById('ongoingList');
+let completedList = document.getElementById('completedList');
+
+function addTask(type) {
+
+  let input =
+    type === 'ongoing'
+      ? document.getElementById('ongoingInput')
+      : document.getElementById('completedInput');
+
+  let text = input.value.trim();
+
+  if (!text) return alert("Enter assignment");
+
+  dashboardData[type].push(text);
+
+  saveDashboardData();
+  renderTasks();
+
+  input.value = '';
+}
+
+function renderTasks() {
+
+  ongoingList.innerHTML = "";
+  completedList.innerHTML = "";
+
+  dashboardData.ongoing.forEach((task, index) => {
+
+    let li = document.createElement('li');
+
+    li.className =
+      "list-group-item d-flex justify-content-between align-items-center";
+
+    li.innerHTML = `
+      <span>${task}</span>
+
+      <div>
+        <button class="btn btn-warning btn-sm me-2"
+          onclick="editTask('ongoing', ${index})">
+          Edit
+        </button>
+
+        <button class="btn btn-danger btn-sm"
+          onclick="deleteTask('ongoing', ${index})">
+          Delete
+        </button>
+      </div>
+    `;
+
+    ongoingList.appendChild(li);
+  });
+
+  dashboardData.completed.forEach((task, index) => {
+
+    let li = document.createElement('li');
+
+    li.className =
+      "list-group-item d-flex justify-content-between align-items-center";
+
+    li.innerHTML = `
+      <span>${task}</span>
+
+      <div>
+        <button class="btn btn-warning btn-sm me-2"
+          onclick="editTask('completed', ${index})">
+          Edit
+        </button>
+
+        <button class="btn btn-danger btn-sm"
+          onclick="deleteTask('completed', ${index})">
+          Delete
+        </button>
+      </div>
+    `;
+
+    completedList.appendChild(li);
+  });
+
+  updatePieChart();
+}
+
+function editTask(type, index) {
+
+  let newText = prompt(
+    "Edit Assignment:",
+    dashboardData[type][index]
+  );
+
+  if (newText) {
+    dashboardData[type][index] = newText;
+
+    saveDashboardData();
+    renderTasks();
+  }
+}
+
+function deleteTask(type, index) {
+
+  dashboardData[type].splice(index, 1);
+
+  saveDashboardData();
+  renderTasks();
+}
+
+// Pie chart
+const ctx = document
+  .getElementById('assignmentPieChart')
+  .getContext('2d');
+
+let pieChart = new Chart(ctx, {
+  type: 'pie',
+
+  data: {
+    labels: ['Ongoing', 'Completed'],
+
+    datasets: [{
+      label: 'Assignments',
+      data: [0, 0],
+      backgroundColor: ['#ffc107', '#198754']
+    }]
+  },
+
+  options: {
+    responsive: true,
+
+    plugins: {
+      legend: {
+        position: 'bottom'
+      }
+    }
+  }
+});
+
+function updatePieChart() {
+
+  pieChart.data.datasets[0].data = [
+    dashboardData.ongoing.length,
+    dashboardData.completed.length
+  ];
+
+  pieChart.update();
+}
+
+// REMINDER
+let reminderList = document.getElementById('reminderList');
+
+function addReminder() {
+
+  let dateInput = document.getElementById('reminderDate');
+  let noteInput = document.getElementById('reminderNote');
+
+  let date = dateInput.value;
+  let note = noteInput.value.trim();
+
+  if (!date || !note)
+    return alert("Please select a date and enter a note");
+
+  dashboardData.reminders.push({
+    date,
+    note
+  });
+
+  saveDashboardData();
+  renderReminders();
+
+  dateInput.value = '';
+  noteInput.value = '';
+}
+
+function renderReminders() {
+
+  reminderList.innerHTML = "";
+
+  dashboardData.reminders.forEach((item, index) => {
+
+    let li = document.createElement('li');
+
+    li.className =
+      "list-group-item d-flex justify-content-between align-items-center";
+
+    li.innerHTML = `
+      <span>
+        <strong>${item.date}</strong>: ${item.note}
+      </span>
+
+      <button class="btn btn-danger btn-sm"
+        onclick="deleteReminder(${index})">
+        Delete
+      </button>
+    `;
+
+    reminderList.appendChild(li);
+  });
+}
+
+function deleteReminder(index) {
+
+  dashboardData.reminders.splice(index, 1);
+
+  saveDashboardData();
+  renderReminders();
+}
+
+renderAssignments();
+renderTasks();
+renderReminders();
+</script>
+
+</body>
+</html>
