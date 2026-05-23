@@ -1,49 +1,44 @@
 # Tick-To-Do
 Project Overview
-Tick-To-Do is a student productivity web developed using HTML, CSS, JavaScript, Bootstrap and LocalStorage. This web helps student to manage their academic assignment more efficiently through task management, smart scheduling and mood tracker features.
 
-The web contains three page:
+Tick-To-Do is a student productivity web-application developed using HTML, CSS, JavaScript, Bootstrap, and LocalStorage. This website helps students manage their academic tasks more efficiently through task management, smart scheduling, and mood tracking features.
+
+User Authentication
+
+Before accessing the web-application, users are required to register an account first if they do not already have one. The registration page allows new users to create an account by entering the required information such as name, email and password. After successful registration, users can log in to access all features available in the Tick-To-Do web application.
+
+The login page is designed to ensure that only registered users can access the website. Once logged in, users will be able to use the Progress Dashboard, Smart Schedule, and Mood Board Tracker features to manage their daily academic activities more efficiently.
+
+The website contains three main pages:
+
 1. Progress Dashboard
 2. Smart Schedule
 3. Mood Board Tracker
 
 System Features
-1. Progress Dashboard (main page)
-This page helps students manage assignments and reminders.
-Functions:
-Add assignment, set due date and can update assignment status
-Add ongoing assignments & completed assignments
-Add reminder notes
-Display assignment progress using Pie Chart
-How to Use:
-Enter assignment name. Then, select due date.Choose your assignment status. Lastly, click Add button.
-Assignment will appear in the table. User can edit status or delete assignment. Progress chart will updates automatically when you enter ongoing & completed assingment.
 
-2. Smart Schedule (2nd pages)
-This page allows students to organize their daily class schedule.
-Functions:
-Add daily class, select day and time. Then they will display user daily class time. User can edit or delete the schedule in timetable
-How to Use:
-Select the day. Enter subject name. Choose time. Click Add Schedule.
-Schedule will appear in the timetable. User may edit or delete schedule anytime.
+1. Progress Dashboard (Main Page)
 
-3. Mood Board Tracker (3rd pages)
-This page tracks student emotions and energy levels.
-Functions:
-Add daily mood. Display user mood history in line graph.
-How to Use:
-Select mood category. Then, select date. Click Add Mood.
-Mood data will be stored and displayed. Line chart automatically updates.
+The Progress Dashboard helps students manage their assignments and reminders in a more organized way. Users can add assignments together with due dates and assignment status to keep track of their academic progress. The page also allows users to add reminder notes, monitor ongoing and completed assignments, and view their overall progress through a pie chart. Besides that, assignments can be edited or deleted anytime whenever changes are needed.
 
-An example account has been created for website testing purposes. Please use the following account to access the web:
-Email: admin@gmail.com
-Pass: 12345
+To use this feature, users only need to enter the assignment name, select the due date, and choose the assignment status before clicking the Add button. Once added, the assignment will automatically appear in the table and the progress chart will update based on the assignment status entered.
+
+2. Smart Schedule (Second Page)
+
+The Smart Schedule page allows students to organize their daily class schedules more effectively. Users can add subjects according to the selected day and time, and the schedule will automatically appear in the timetable layout provided. This feature also gives users the flexibility to edit or delete schedules whenever necessary.
+
+To use this page, users need to select the day, enter the subject name, and choose the class time before clicking the Add Schedule button. The schedule will then be displayed in the timetable automatically for easier daily planning.
+
+3. Mood Board Tracker (Third Page)
+
+The Mood Board Tracker helps students monitor their emotions and energy levels on a daily basis. Users can record their mood based on different categories, and the data will be stored automatically using LocalStorage. The page also displays mood history in a line graph, allowing users to observe their emotional patterns over time.
+
+To use this feature, users simply select a mood category and date before clicking the Add Mood button. After that, the mood information will be stored and displayed automatically, while the line graph updates whenever new mood data is added.
 
 
-Frameworks/Libraries Used
-Bootstrap
-Bootstrap Icons
-Chart.js
-Google Fonts
-JavaScript
-Local Storage
+Frameworks and Libraries Used :
+Bootstrap,
+Bootstrap Icons,
+Chart.js,
+Google Fonts,
+JavaScript.
